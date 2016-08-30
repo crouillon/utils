@@ -255,10 +255,16 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
                 1 => ['name' => 'Charles', 'role' => 'lead developper'],
                 2 => ['name' => 'Eric', 'role' => 'developper'],
                 3 => 'Florian',
+                4 => 'Alex',
+
             ],
             'foo' => 'bar',
             'bar' => ['foo'],
             'back' => 'bee',
+            'frameworks' => [
+                1 => [1 => 'Rails', 2 => 'ruby'],
+                2 => [1 => 'Symfony', 2 => 'php'],
+            ],
         ];
         $users2 = [
             0 => 'Djoudi',
@@ -266,23 +272,35 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
                 1 => 'Mickael',
                 2 => ['name' => 'Harris', 'role' => 'developper'],
                 3 => ['name' => 'Nicolas', 'role' => 'developper'],
+                4 => 'Florian',
             ],
             'foo' => 'foo',
             'bar' => 'bar',
             'back' => ['bee'],
+            'frameworks' => [
+                1 => [1 => 'Django', 2 => 'python'],
+                2 => [1 => 'Symfony', 2 => 'php'],
+            ],
         ];
         $mergedUsers = [
             'users' => [
                 1 => ['name' => 'Charles', 'role' => 'lead developper'],
                 2 => ['name' => 'Eric', 'role' => 'developper'],
                 3 => 'Florian',
-                4 => 'Mickael',
-                5 => ['name' => 'Harris', 'role' => 'developper'],
-                6 => ['name' => 'Nicolas', 'role' => 'developper'],
+                4 => 'Alex',
+                5 => 'Mickael',
+                6 => ['name' => 'Harris', 'role' => 'developper'],
+                7 => ['name' => 'Nicolas', 'role' => 'developper'],
+                
             ],
             'foo' => 'foo',
             'bar' => 'bar',
             'back' => ['bee'],
+            'frameworks' => [
+                1 => [1 => 'Rails', 2 => 'ruby'],
+                2 => [1 => 'Symfony', 2 => 'php'],
+                3 => [1 => 'Django', 2 => 'python'],
+            ],
             0 => 'Djoudi',
         ];
 
