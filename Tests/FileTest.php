@@ -58,6 +58,14 @@ class FileTest extends UtilsTestCase
 
     public function testNormalizePath()
     {
+        $this->assertEquals('/fake/file/path', File::normalizePath('/fake\file/path\\//', '/'));
+        $this->assertEquals('/fake/file/path/', File::normalizePath('/fake\file/path\\//', '/', false));
+        $this->assertEquals('C:\fake\file\path', File::normalizePath('C:\fake\file/path\\//', '\\'));
+        $this->assertEquals('C:\fake\file\path\\', File::normalizePath('C:/fake\file/path\\//', '\\', false));
+        $this->assertEquals('http://host/fake/path', File::normalizePath('http://host/fake\path\\'));
+        $this->assertEquals('http://host:80/fake/path', File::normalizePath('http://host:80/fake\path\\'));
+        $this->assertEquals('http://user@host:80/fake/path', File::normalizePath('http://user@host:80/fake\path\\'));
+        $this->assertEquals('http://user:pass@host:80/fake/path', File::normalizePath('http://user:pass@host:80/fake\path\\'));
         $this->assertEquals(realpath($this->folderPath), File::normalizePath($this->folderPath));
     }
 
@@ -97,6 +105,10 @@ class FileTest extends UtilsTestCase
      */
     public function testExistingDirMkdirWithBadRights()
     {
+        if (is_writable($this->privatePath)) {
+            $this->markTestSkipped('Unsupported feature on '.PHP_OS);
+        }
+
         File::mkdir($this->privatePath);
     }
 

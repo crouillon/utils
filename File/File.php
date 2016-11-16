@@ -98,22 +98,33 @@ class File
      */
     public static function normalizePath($filepath, $separator = DIRECTORY_SEPARATOR, $removeTrailing = true)
     {
-        $schemeMatches = [];
-        $scheme = "";
-        if (preg_match('#^([a-z]{2,10}\:'.$separator.'{2,})(.+)$#i', $filepath, $schemeMatches)) {
-            $scheme = $schemeMatches[1];
-            $filepath = $schemeMatches[2];
+        $scheme = '';
+        if (false !== $parseUrl = parse_url($filepath)) {
+            $auth = isset($parseUrl['user']) ? $parseUrl['user'] : '';
+            $auth .= isset($parseUrl['pass']) ? ':' . $parseUrl['pass'] : '';
+            $auth .= (isset($parseUrl['user']) || isset($parseUrl['pass'])) ? '@' : '';
+            $scheme .= isset($parseUrl['scheme']) ? $parseUrl['scheme'] . ':' : '';
+            $scheme .= isset($parseUrl['host']) ? '//' . $auth . $parseUrl['host'] : '';
+            $scheme .= isset($parseUrl['port']) ? ':' . $parseUrl['port'] : '';
+
+            if (isset($parseUrl['path'])) {
+                $filepath = $parseUrl['path'];
+            }
+
+            if (isset($parseUrl['scheme']) && isset($parseUrl['host'])) {
+                $separator = '/';
+            }
         }
 
-        $patterns = array('/\//', '/\\\\/', '/'.str_replace('/', '\/', $separator).'+/');
-        $replacements = array_fill(0, 3, $separator);
+        $patterns = array('/\//', '/\\\\/', '/\/+/');
+        $replacements = array_fill(0, 3, '/');
 
         if (true === $removeTrailing) {
-            $patterns[] = '/'.str_replace('/', '\/', $separator).'$/';
+            $patterns[] = '/\/$/';
             $replacements[] = '';
         }
 
-        return $scheme.preg_replace($patterns, $replacements, $filepath);
+        return str_replace('/', $separator, $scheme.preg_replace($patterns, $replacements, $filepath));
     }
 
     /**
@@ -314,7 +325,7 @@ class File
 
         if (empty($extension)) {
             // extension is empty - assume user wants files without extension only
-            $regex = '#^(.*?/)?[^\.]+$#i';
+            $regex = '/^(.*?(\/|\\\\))?[^\.]+$/i';
         } else {
             $regex = '#^.+\.'.ltrim($extension, '.').'$#i';
         }
@@ -347,7 +358,14 @@ class File
         $parse_url = parse_url($basedir);
         if (false !== $parse_url && isset($parse_url['scheme'])) {
             foreach (Dir::getContent($basedir) as $file) {
-                if (!is_dir($file) && $extension === substr($file, -1 * strlen($extension))) {
+                if (is_dir($file)) {
+                    continue;
+                }
+
+                if (
+                        ('' === $extension && false === strpos(basename($file), '.'))
+                        || ('' !== $extension && $extension === substr($file, -1 * strlen($extension)))
+                ) {
                     $files[] = $basedir.DIRECTORY_SEPARATOR.$file;
                 }
             }

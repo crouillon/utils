@@ -100,6 +100,10 @@ class DirTest extends UtilsTestCase
      */
     public function testDeleteFails()
     {
+        if (false !== strpos(PHP_OS, 'WIN')) {
+            throw new \PHPUnit_Framework_Error_Warning();
+        }
+
         $this->assertFalse(Dir::delete($this->privatePath));
         $this->assertFileExists($this->privatePath);
     }
